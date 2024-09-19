@@ -1,5 +1,5 @@
 import { ItemRepository } from "../../../domain/repository/item-repository";
-import { GetItemsInput } from "./get-item-input";
+import { GetItemsInput } from "./get-items-input";
 import { GetItemsOutput } from "./get-tems-output";
 
 export class GetItemsUseCase{
