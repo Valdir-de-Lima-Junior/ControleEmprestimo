@@ -10,6 +10,7 @@ export class UserController{
     create(input: any){
         const createUserUseCase = new CreateUserUseCase(this.userRepository);
         createUserUseCase.execute(input);
+        
     }
 
     update(input: any){
