@@ -2,7 +2,7 @@ import { ItemTypeRepository } from "../../../domain/repository/item-type-reposit
 import { GetItemTypeInput } from "./get-itemType-input";
 import { GetItemTypeOutput } from "./get-itemType-output";
 
-export class GetItemUseCase{
+export class GetItemTypeUseCase{
     constructor(readonly itemTypeRepository: ItemTypeRepository){}
 
     execute(input: GetItemTypeInput): GetItemTypeOutput {

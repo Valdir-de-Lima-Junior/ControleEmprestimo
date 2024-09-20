@@ -2,7 +2,7 @@ import { ItemTypeRepository } from "../../../domain/repository/item-type-reposit
 import { DeleteItemTypeInput } from "./delete-itemType-input";
 import { DeleteItemTypeOutput } from "./delete-itemType-output";
 
-export class DeleteItemUseCase {
+export class DeleteItemTypeUseCase {
     constructor(readonly itemTypeRepository: ItemTypeRepository){
 
     }
