@@ -3,9 +3,8 @@ import { UpdateItemInput } from "./update-item-input";
 import { UpdateItemOutput } from "./update-item-output";
 
 export class UpdateItemUseCase {
-    constructor(readonly itemRepository: ItemRepository){
+    constructor(readonly itemRepository: ItemRepository){};
 
-    }
     execute(input: UpdateItemInput): UpdateItemOutput{
         return {};
     }
