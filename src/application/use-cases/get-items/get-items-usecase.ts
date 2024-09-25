@@ -11,16 +11,17 @@ export class GetItemsUseCase{
         const output: GetItemsOutput[] = [];
 
         for (const item of itemList){
-            output.push{
+            output.push(
                 {
                     id: item.getId(),
                     name: item.getName(),
+
                     itemType: {
-                        id: item.getItemType().getId(),
-                        name: item.getItemType().getName()
+                        id: item.getType().getId(),
+                        name: item.getType().getName()
                     }
                 }
-            }
+            )
         }
 
         return output;

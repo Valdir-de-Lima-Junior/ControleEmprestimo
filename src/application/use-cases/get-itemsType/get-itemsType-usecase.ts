@@ -5,7 +5,20 @@ import { GetItemsTypeOutput } from "./get-itemsType-output";
 export class GetItemsUseCase{
     constructor(readonly itemTypeRepository: ItemTypeRepository){}
 
-    execute(input: GetItemsTypeInput): GetItemsTypeOutput{
-        return {};
+    execute(input: GetItemsTypeInput): GetItemsTypeOutput[] {
+        const itemTypeList = this.itemTypeRepository.getAll();
+
+        const output: GetItemsTypeOutput[] = [];
+
+        for(const itemType of itemTypeList){
+            output.push(
+                {
+                    id: itemType.getId(),
+                    name: itemType.getName(),
+                }
+            )
+        }
+
+        return output;
     }
 }

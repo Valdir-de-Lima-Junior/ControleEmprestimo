@@ -2,17 +2,20 @@ import { v4 } from 'uuid';
 import { Item } from './item';
 import { Person } from './person';
 import { User } from './user';
+import { ItemType } from './item-type';
 
 export class Loan{
     private id: string;
     private person: Person;
     private user: User;
     private item: Item;
+    private itemType: ItemType;
     private loanDate: Date;
     private returnDate?: Date;
     
-    constructor(item: Item, person: Person, user:User, loanDate: Date, returnDate?: Date, id?: string, ){
+    constructor(item: Item, itemType: ItemType,person: Person, user:User, loanDate: Date, returnDate?: Date, id?: string, ){
         this.item = item; 
+        this.itemType = itemType;
         this.person = person; 
         this.user = user;
         this.loanDate = loanDate; 
@@ -26,6 +29,10 @@ export class Loan{
 
     getItem(): Item{
         return this.item;
+    }
+
+    getItemType(): ItemType{
+        return this.itemType;
     }
 
     getPerson(): Person{
