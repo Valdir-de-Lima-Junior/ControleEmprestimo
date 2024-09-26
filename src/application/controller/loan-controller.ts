@@ -18,7 +18,7 @@ export class LoanController{
         updateLoanUseCase.execute(input);
     }
 
-    get(input: any){
+    getByID(input: any){
         const getLoanUseCase = new GetLoanUseCase(this.loanRepository);
         getLoanUseCase.execute(input);
     }

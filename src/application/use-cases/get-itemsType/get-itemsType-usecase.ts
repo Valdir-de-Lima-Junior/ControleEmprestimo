@@ -3,10 +3,10 @@ import { GetItemsTypeInput } from "./get-itemsType-input";
 import { GetItemsTypeOutput } from "./get-itemsType-output";
 
 export class GetItemsUseCase{
-    constructor(readonly itemTypeRepository: ItemTypeRepository){}
+    constructor(readonly itemsTypeRepository: ItemTypeRepository){}
 
     execute(input: GetItemsTypeInput): GetItemsTypeOutput[] {
-        const itemTypeList = this.itemTypeRepository.getAll();
+        const itemTypeList = this.itemsTypeRepository.getAll();
 
         const output: GetItemsTypeOutput[] = [];
 

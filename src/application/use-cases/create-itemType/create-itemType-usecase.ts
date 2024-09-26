@@ -1,9 +1,10 @@
-import { ItemRepository } from "../../../domain/repository/item-repository";
+
 import { CreateItemTypeOutput } from "./create-itemType-output";
 import { CreateItemTypeInput } from "./create-itemType-input";
+import { ItemTypeRepository } from "../../../domain/repository/item-type-repository";
 
 export class CreateItemTypeUseCase{
-    constructor(readonly itemRepository: ItemRepository){}
+    constructor(readonly itemTypeRepository: ItemTypeRepository){}
     
     execute(input: CreateItemTypeInput): CreateItemTypeOutput {
         return {};

@@ -17,10 +17,11 @@ update(input: any){
     updateItemTypeUseCase.execute(input);
 }
 
-get(input: any){
+getByID(input: any){
    const getItemTypeUseCase = new GetItemTypeUseCase(this.itemTypeRepository);
    getItemTypeUseCase.execute(input);
 }
+
 
 delete(input: any){
     const deleteItemTypeUseCase = new DeleteItemTypeUseCase(this.itemTypeRepository);

@@ -15,13 +15,19 @@ export class ItemRepositoryMemory implements ItemRepository{
      }
 
     getAll(): Item[] {
-         return this.items;
+        return this.items;
     }
     getById(id: string): Item {
-        throw new Error("Method not implemented.");
+        const item = this.items.find(valor => valor.getId() == id)
+
+        if (!item){
+            throw new Error("ItemType not Found");
+        }
+
+        return item;
     }
     create(item: Item): void {
-        throw new Error("Method not implemented.");
+        this.items.push(item)
     }
     update(item: Item): void {
         throw new Error("Method not implemented.");
