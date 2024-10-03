@@ -14,11 +14,7 @@ export class GetUsersUseCase{
             output.push(
                 {
                     id: user.getId(),
-                    name: user.getName(),
-                    person: {
-                        id: user.getPerson().getId(),
-                        name: user.getPerson().getName()
-                    }
+                    name: user.getName()
                 }
             )
         }
