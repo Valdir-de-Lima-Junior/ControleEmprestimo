@@ -5,8 +5,8 @@ import { GetLoansOutput } from "./get-loans-output";
 export class GetLoansUseCase{
     constructor(readonly loanRepository: LoanRepository){}
 
-    execute(input: GetLoansInput): GetLoansOutput[] {
-        const loanList = this.loanRepository.getAll();
+    async execute(input: GetLoansInput): Promise<GetLoansOutput[]> {
+        const loanList = await this.loanRepository.getAll();
 
         const output: GetLoansOutput[] = [];
 
@@ -17,20 +17,19 @@ export class GetLoansUseCase{
                     item: {
                         id: loan.getItem().getId(),
                         name: loan.getItem().getName(),
+                        itemType: loan.getItem().getType()
                     },
-                    itemType: {
-                        id: loan.getItemType().getId(),
-                        name: loan.getItemType().getName()
-                    },
+                    loanDate: loan.getLoanDate(),
+                    returnDate: loan.getReturnDate(),
                     person: {
                         id: loan.getPerson().getId(),
                         name: loan.getPerson().getName()
                     },
                     user: {
                         id: loan.getUser().getId(),
-                        name: loan.getUser().getName()
+                        userName: loan.getUser().getName()
                     }
-                }
+                }    
             )
         }
         

@@ -2,11 +2,12 @@ import { ItemTypeRepository } from "../../../domain/repository/item-type-reposit
 import { GetItemsTypeInput } from "./get-itemsType-input";
 import { GetItemsTypeOutput } from "./get-itemsType-output";
 
-export class GetItemsUseCase{
-    constructor(readonly itemsTypeRepository: ItemTypeRepository){}
+export class GetItemsTypeUseCase{
 
-    execute(input: GetItemsTypeInput): GetItemsTypeOutput[] {
-        const itemTypeList = this.itemsTypeRepository.getAll();
+    constructor(readonly itemTypeRepository: ItemTypeRepository){}
+
+    async execute(input: GetItemsTypeInput): Promise<GetItemsTypeOutput[]> {
+        const itemTypeList = await this.itemTypeRepository.getAll();
 
         const output: GetItemsTypeOutput[] = [];
 

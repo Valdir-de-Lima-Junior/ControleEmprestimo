@@ -5,7 +5,13 @@ import { GetItemTypeOutput } from "./get-itemType-output";
 export class GetItemTypeUseCase{
     constructor(readonly itemTypeRepository: ItemTypeRepository){}
 
-    execute(input: GetItemTypeInput): GetItemTypeOutput {
-        return {};
+    async execute(input: GetItemTypeInput): Promise<GetItemTypeOutput> {
+        const itemType = await this.itemTypeRepository.getById(input.id);
+        
+        const output: GetItemTypeOutput = {
+            id: itemType.getId(),
+            name: itemType.getName(),
+        }
+        return output;
     }
 }

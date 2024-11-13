@@ -1,10 +1,10 @@
 type ItemTypeOutput = {
-    id: string;
+    id: string | undefined;
     name: string;
 }
 
 export type GetItemsOutput = {
-    id: string;
+    id: string | undefined;
     name: string;
     itemType: ItemTypeOutput;
 }

@@ -1,40 +1,63 @@
 import { ItemRepository } from "../../domain/repository/item-repository";
 import { ItemTypeRepository } from "../../domain/repository/item-type-repository";
+import { RepositoryFactory } from "../../domain/repository/repository-factory";
 import { CreateItemUseCase } from "../use-cases/create-item/create-item-usecase";
 import { DeleteItemUseCase } from "../use-cases/delete-item/delete-item-usecase";
 import { GetItemUseCase } from "../use-cases/get-item/get-item-usecase";
 import { GetItemsUseCase } from "../use-cases/get-items/get-items-usecase";
+import { UpdateItemInput } from "../use-cases/update-item/update-item-input";
 import { UpdateItemUseCase } from "../use-cases/update-item/update-item-usecase";
 
+
 export class ItemController{
-    constructor(
+    constructor(private repositoryFactory: RepositoryFactory,
         private readonly itemRepository: ItemRepository,
         private readonly itemTypeRepository: ItemTypeRepository
     ){}
-
-    create(input: any){
-        const createItemUseCase = new CreateItemUseCase(this.itemRepository, this.itemTypeRepository);
-        return createItemUseCase.execute(input);
-    }
-
-    update(input: any){
-        const updateItemUseCase = new UpdateItemUseCase(this.itemRepository);
-        updateItemUseCase.execute(input);
-    }
-
-    getByID(input: any){
-        const getItemUseCase = new GetItemUseCase(this.itemRepository);
-        return getItemUseCase.execute(input);
-    }
-
     
-    getAll(input: any){
-        const getItemsUseCase = new GetItemsUseCase(this.itemRepository);
-        return getItemsUseCase.execute(input);
+    async getAll(input: any){
+        const getItems = new GetItemsUseCase(this.itemRepository);
+        return await getItems.execute(input);
+    }
+    
+    async getByID(id: string){
+        try {
+            const getItem = new GetItemUseCase(this.itemRepository);
+            return await getItem.execute({id});
+        } catch (e: any){
+            return {
+                message: e.message
+            }
+        }
     }
 
-    delete(input: any){
-        const deleteItemUseCase = new DeleteItemUseCase(this.itemRepository);
-        deleteItemUseCase.execute(input);
+    async create(input: any){
+        try{
+            const createItem = new CreateItemUseCase(this.repositoryFactory);
+            return await createItem.execute(input);
+        } catch (e: any) {
+            return{
+            message: e.message
+        }
+    }
+    }
+
+    update(input: UpdateItemInput){
+        const updateItemUseCase = new UpdateItemUseCase(
+            this.itemRepository,
+            this.itemTypeRepository
+        );
+        return updateItemUseCase.execute(input);
+    }
+
+    delete(id: string){
+        try{
+            const deleteItem = new DeleteItemUseCase(this.itemRepository);
+            return deleteItem.execute({id});
+        } catch (e: any){
+            return {
+                message: e.message
+            }
+        }
     }
 }

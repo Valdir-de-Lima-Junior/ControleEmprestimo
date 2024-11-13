@@ -6,7 +6,8 @@ export class DeleteItemTypeUseCase {
     constructor(readonly itemTypeRepository: ItemTypeRepository){
 
     }
-    execute(input: DeleteItemTypeInput): DeleteItemTypeOutput{
+    execute(input: DeleteItemTypeInput): DeleteItemTypeOutput {
+        this.itemTypeRepository.delete(input.id)
         return {};
     }
     

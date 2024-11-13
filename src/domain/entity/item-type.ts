@@ -1,7 +1,7 @@
 import { v4 } from 'uuid';
 export class ItemType{
     private name: string;
-    private id: string;
+    private id?: string;
     constructor(name: string, id?: string){
         this.name = name;
         if (!id){
@@ -11,11 +11,12 @@ export class ItemType{
 
     }
 
+    getId():string | undefined{
+        return this.id;
+    }
+
     getName():string{
         return this.name;
     }
 
-    getId():string{
-        return this.id;
-    }
 }

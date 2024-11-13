@@ -1,27 +1,26 @@
-type ItemOutput = {
-    id: string;
+import { ItemType } from "../../../domain/entity/item-type";
+
+type item = {
+    id: string | undefined;
+    name: string;
+    itemType: ItemType;
+}
+
+type person = {
+    id: string | undefined;
     name: string;
 }
 
-type ItemTypeOutput = {
-    id: string;
-    name: string;
-}
-
-type PersonOutput = {
-    id: string;
-    name: string;
-}
-
-type UserOutput = {
-    id: string;
-    name: String;
+type user = {
+    id: string | undefined;
+    userName: String;
 }
 
 export type GetLoansOutput = {
-    id: string;
-    item: ItemOutput;
-    itemType: ItemTypeOutput;
-    person: PersonOutput;
-    user: UserOutput;
+    id: string | undefined;
+    item: item;
+    loanDate: Date | undefined;
+    returnDate: Date | undefined;
+    person: person;
+    user: user;
 }

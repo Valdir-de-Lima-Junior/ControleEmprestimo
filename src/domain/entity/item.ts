@@ -2,8 +2,9 @@ import { v4 } from 'uuid';
 import { ItemType } from './item-type';
 export class Item{
     private name: string;
-    private id: string;
+    private id?: string;
     private type: ItemType
+    
     constructor(name: string, type: ItemType, id?: string){
         this.name = name;
         this.type = type;
@@ -11,14 +12,13 @@ export class Item{
             id = v4();
         }
         this.id = id;
-
     }
 
     getName():string{
         return this.name;
     }
 
-    getId():string{
+    getId():string | undefined{
         return this.id;
     }
 

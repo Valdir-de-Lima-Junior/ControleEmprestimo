@@ -1,10 +1,10 @@
 import { User } from "../entity/user";
 
 export interface UserRepository{
-    getAll(): User[];
-    getById(id: string): User;
-    getByUserName(userName: string): User;
-    create(item: User): void;
-    update(item: User): void;
-    
+    getAll(): Promise<User[]>;
+    getById(id: string): Promise<User>;
+    getByUserName(userName: string): Promise<User>;
+    create(item: User): Promise<void>;
+    update(item: User): Promise<void>;
+    delete(id: string): Promise<void>;
 }

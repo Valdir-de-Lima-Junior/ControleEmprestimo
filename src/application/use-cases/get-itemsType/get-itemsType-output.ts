@@ -1,4 +1,4 @@
 export type GetItemsTypeOutput = {
-    id: string;
+    id: string | undefined;
     name: string;
 }

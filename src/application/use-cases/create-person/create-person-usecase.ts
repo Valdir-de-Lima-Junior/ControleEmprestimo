@@ -1,11 +1,25 @@
+import { Person } from "../../../domain/entity/person";
 import { PersonRepository } from "../../../domain/repository/person-repository";
-import { CreateItemOutput } from "../create-item/create-item-output";
+import { RepositoryFactory } from "../../../domain/repository/repository-factory";
 import { CreatePersonInput } from "./create-person-input";
 
 export class CreatePersonUseCase{
-    constructor(readonly personRepository: PersonRepository){}
+    private personRepository: PersonRepository;
+    constructor(private repositoryFactory: RepositoryFactory)
+    {
+        this.personRepository = repositoryFactory.createPersonRepository();
+    }
 
-    execute(input: CreatePersonInput): CreateItemOutput{
+    async execute(input: CreatePersonInput) {
+        if (!input.id) {
+            throw new Error('Código da Pessoa não informada');
+        }
+        if (!input.name) {
+            throw new Error('Nome da Pessoa não informada');
+        }
+
+        const person = new Person( input.id, input.name)
+        await this.personRepository.create(person)
         return {};
     }
 } 

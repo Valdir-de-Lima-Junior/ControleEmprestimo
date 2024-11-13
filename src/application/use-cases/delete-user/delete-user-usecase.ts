@@ -7,6 +7,7 @@ export class DeleteUserUseCase {
 
     }
     execute(input: DeleteUserInput): DeleteUserOutput{
+        this.userRepository.delete(input.id);
         return {};
     }
     

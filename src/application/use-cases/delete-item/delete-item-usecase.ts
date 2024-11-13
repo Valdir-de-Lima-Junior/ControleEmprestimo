@@ -7,6 +7,8 @@ export class DeleteItemUseCase {
 
     }
     execute(input: DeleteItemInput): DeleteItemOutput {
+        this.itemRepository.delete(input.id)
+        
         return {};
 
     }

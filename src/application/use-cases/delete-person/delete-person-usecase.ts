@@ -6,7 +6,8 @@ export class DeletePersonUseCase {
     constructor(readonly personRepository: PersonRepository){
 
     }
-    execute(input: DeletePersonInput): DeletePersonOutput{
+    execute(input: DeletePersonInput): DeletePersonOutput {
+        this.personRepository.delete(input.id);
         return {};
     }
     

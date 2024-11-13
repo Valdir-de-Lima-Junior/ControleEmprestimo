@@ -6,7 +6,8 @@ export class DeleteLoanUseCase {
     constructor(readonly loanRepository: LoanRepository){
 
     }
-    execute(input: DeleteLoanInput): DeleteLoanOutput{
+     execute(input: DeleteLoanInput): DeleteLoanOutput{
+        this.loanRepository.delete(input.id)
         return {};
     }
     

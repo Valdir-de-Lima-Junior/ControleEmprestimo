@@ -1,13 +1,18 @@
+import { Person } from "../../../domain/entity/person";
 import { PersonRepository } from "../../../domain/repository/person-repository";
 import { UpdatePersonInput } from "./update-person-input";
 import { UpdatePersonOutput } from "./update-person-output";
 
 export class UpdatePersonUseCase {
-    constructor(readonly personRepository: PersonRepository){
+    
+    constructor(private readonly personRepository: PersonRepository){}
+    
+    async execute(input: UpdatePersonInput): Promise<UpdatePersonOutput> {
+        const person = await this.personRepository.getById(input.id);
+        const newPerson = new Person(input.name, input.id)
+        this. personRepository.update(newPerson)
 
-    }
-    execute(input: UpdatePersonInput): UpdatePersonOutput{
-        return {};
+        return {id: person.getId()};
     }
     
 }

@@ -1,3 +1,3 @@
-export type UpdateItemTypeOutput = {
-    
+export type UpdateItemTypeOutput = { 
+    id: string | undefined;
 }

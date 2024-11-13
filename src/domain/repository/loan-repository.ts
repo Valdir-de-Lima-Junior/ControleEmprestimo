@@ -1,9 +1,9 @@
 import { Loan } from "../entity/loan";
 
 export interface LoanRepository{
-    getAll(): Loan[];
-    getById(id: string): Loan;
-    create(item: Loan): void;
-    update(item: Loan): void;
-    
+    getAll(): Promise<Loan[]>;
+    getById(id: string): Promise<Loan>;
+    create(item: Loan): Promise<void>;
+    update(item: Loan): Promise<void>;
+    delete(id: string): Promise<void>;
 }
