@@ -20,12 +20,12 @@ export default class ItemRepositoryDatabase implements ItemRepository {
     
     async getAll(): Promise<Item[]> {
         const output = [];
-        const itemData = await this.connection.execute(´
+        const itemData = await this.connection.execute(`
         SELECT item.nome AS nome, Item.preco AS preco, Item.quantidade AS quantidade, Item.imagem AS imagem,
         Item.descricao AS descricao, Item.id AS id, Item.categoria_id AS categoria_id
         FROM item
         LEFT JOIN categoria ON item_categoria.categoria_id = categoria.id
-        ORDER BY Item.id ´);
+        ORDER BY Item.id `);
         
     
         for (const item of itemData) {

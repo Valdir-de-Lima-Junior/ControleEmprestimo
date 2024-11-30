@@ -4,7 +4,7 @@ export class User{
 
     private userName: string;
     private id?: string;
-    private password?: string;
+    private password: string;
     private person: Person;
 
     constructor(userName: string,  person: Person, password?: string, id?: string){
@@ -28,7 +28,7 @@ export class User{
         return this.id;
     }
 
-    getPassword():string | undefined{
+    getPassword():string {
         return this.password;
     }
 

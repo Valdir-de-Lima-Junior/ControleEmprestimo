@@ -20,11 +20,11 @@ export default class ItemTypeRepositoryDatabase implements ItemTypeRepository{
  
     async  getAll(): Promise<ItemType[]> {
         const output = [];
-        const ItemType = await this.connection.getRepository(ItemType).execute(´
+        const ItemType = await this.connection.getRepository(ItemType).execute(`
         SELECT ItemType.nome AS nome, ItemType.id AS id 
         FROM ItemType
         LEFT JOIN Item ON Item.idItemType = ItemType.id
-        ´);
+        `);
         
         for(const item of ItemType){
         const itemOutput = new ItemType(
@@ -39,3 +39,4 @@ export default class ItemTypeRepositoryDatabase implements ItemTypeRepository{
             );
         }
       }
+    }
