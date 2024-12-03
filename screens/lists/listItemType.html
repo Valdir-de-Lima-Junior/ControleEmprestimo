@@ -8,22 +8,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tipo Item</title>
     <style>
-        .container{
-          font-family: Arial, Helvetica, sans-serif;
+        .container {
+            font-family: Arial, Helvetica, sans-serif;
         }
         
-        .table thead th{
+        .table thead th {
             background-color: #171430;
             color: white;
         }
-        .grupo-botoes{
+
+        .grupo-botoes {
             text-align: center;
+        }
+
+        .larguraAll {
+            width: 25%;
         }
     </style>
 </head>
 <body>
 
-  <nav class="navbar navbar-expand-lg colortext">
+  <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -61,56 +66,97 @@
         <h1>Tipo Item</h1>
         <hr>
         <table class="table table-hover table-striped">
-            <thead  class="table-success">
+            <thead class="table-success">
                 <tr>
                     <th class="larguraAll">ID</th>
                     <th>Tipo Item</th>
+                    <th>Ação</th>
                 </tr>
             </thead>
 
-            <tbody>
-                
+            <tbody id="tipoItemsGrid">
             </tbody>
         </table>
 
-        <div class="grupo-botoes">   
-            
-          <a class="btn btn-success" href="cads/cadItemType.html" role="button">
-            <i class="bi bi-plus-circle-fill"></i>
-              Cadastrar
-          </a>
+        <div class="grupo-botoes">
+            <a class="btn btn-success" href="cadItemType.html" role="button">
+                <i class="bi bi-plus-circle-fill"></i>
+                Cadastrar
+            </a>
 
-            <button class="btn btn-danger">
+            <button class="btn btn-danger" onclick="excluirItemTipo()">
                 <i class="bi bi-x-circle-fill"></i>
                 Excluir
             </button>
 
-            <button class="btn btn-secondary" >
-              <i class="bi bi-pencil-square"></i>
-              Editar
+            <button class="btn btn-secondary" onclick="editarItemTipo()">
+                <i class="bi bi-pencil-square"></i>
+                Editar
             </button>
         </div>
-        
+       
     </div>
   
-  <!-- Modal -->
-  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          ...
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Understood</button>
-        </div>
-      </div>
-    </div>
-  </div>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-beta1/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let itemTipoIdParaExcluir = null;
+        let nomeItemTipoParaExcluir = '';
+
+        async function carregarTipoItems() {
+            const response = await fetch('https://cefb9c9b-1c49-4c67-9064-bd6b7509fdf7.mock.pstmn.io/items_type');
+            const tipos = await response.json();
+            const tiposGrid = document.getElementById('tipoItemsGrid');
+            tiposGrid.innerHTML = '';
+
+            tipos.forEach(tipo => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${tipo.id}</td>
+                    <td>${tipo.name}</td>
+                    <td>
+                        <a href="cadItemType.html?id=${tipo.id}" class="btn btn-warning btn-sm">Editar</a>
+                        <button class="btn btn-danger btn-sm" onclick="confirmarExclusao(${tipo.id}, '${tipo.name}')">Excluir</button>
+                    </td>
+                `;
+                tiposGrid.appendChild(row);
+            });
+        }
+
+        function confirmarExclusao(id, nome) {
+            itemTipoIdParaExcluir = id;
+            nomeItemTipoParaExcluir = nome;
+
+            document.getElementById('modalBodyTexto').innerHTML = `Tem certeza que deseja excluir o Tipo Item <b>${nome}</b>?`;
+
+            new bootstrap.Modal('#staticBackdrop').show();
+        }
+
+        async function excluirItemTipo() {
+            if (itemTipoIdParaExcluir !== null) {
+                const response = await fetch(`https://cefb9c9b-1c49-4c67-9064-bd6b7509fdf7.mock.pstmn.io/items_type/${itemTipoIdParaExcluir}`, { method: 'DELETE' });
+                if (response.ok) {
+                    alert('Tipo Item excluído com sucesso!');
+                    carregarTipoItems();
+                }
+                itemTipoIdParaExcluir = null; 
+                new bootstrap.Modal(document.getElementById('staticBackdrop')).hide(); 
+            }
+        }
+
+        function editarItemTipo() {
+            if (itemTipoIdParaExcluir !== null) {
+                window.location.href = `cadItemType.html?id=${itemTipoIdParaExcluir}`;
+            } else {
+                alert("Selecione um item para editar.");
+            }
+        }
+
+        
+        carregarTipoItems();
+    
+    </script>  
 
 </body>
 </html>

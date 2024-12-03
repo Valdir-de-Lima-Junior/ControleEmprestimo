@@ -9,13 +9,14 @@
     <title>Items</title>
     <style>
         .container{
-          font-family: Arial, Helvetica, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
         }
-        
+
         .table thead th{
             background-color: #171430;
             color: white;
         }
+
         .grupo-botoes{
             text-align: center;
         }
@@ -60,62 +61,156 @@
       </div>
     </div>
   </nav>
-
+  
     <div class="container">
-        <h1>Items</h1>
+        <h1>Itens</h1>
         <hr>
         <table class="table table-hover table-striped">
-            <thead  class="table-success">
+            <thead class="table-success">
                 <tr>
                     <th class="larguraAll">CA</th>
                     <th class="larguraAll">Nome</th>
                     <th class="larguraAll">Validade</th>
+                    <th>Ações</th>
                 </tr>
             </thead>
 
-            <tbody>
-                
+            <tbody id="itemsGrid">
             </tbody>
         </table>
+        <div class="grupo-botoes">
+            <button class="btn btn-success" onclick="window.location.href='cadItem.html'">
+                <i class="bi bi-plus-circle-dotted"></i>
+                Cadastrar
+            </button>
 
-      <div class="grupo-botoes">   
-          
-          <a class="btn btn-success" href="cads/cadItem.html" role="button">
-            <i class="bi bi-plus-circle-fill"></i>
-              Cadastrar
-          </a>
-
-          <button class="btn btn-danger">
-              <i class="bi bi-x-circle-fill"></i>
-              Excluir
-          </button>
-
-          <button class="btn btn-secondary">
-            <i class="bi bi-pencil-square"></i>
-            Editar
-          </button>
-      </div>
-      
+            <button class="btn btn-primary" onclick="imprimirItems()">
+                <i class="bi bi-printer"></i>
+                Imprimir
+            </button>
+        </div>
     </div>
-  
-  <!-- Modal -->
-  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+    <!-- Modal de Exclusão -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Excluir Item</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalBodyTexto">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-danger" onclick="excluirItemEpi()">Excluir</button>
+                </div>
+            </div>
         </div>
-        <div class="modal-body">
-          ...
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Understood</button>
-        </div>
-      </div>
     </div>
-  </div>
+
+    <script>
+        let itemEpiIdParaExcluir = null;
+        let caItemParaExcluir = '';
+
+        async function carregarItemsEpi() {
+            const response = await fetch('http://localhost:3000/api/items_epi');
+            const itemsEpi = await response.json();
+            const itemsGrid = document.getElementById('itemsGrid');
+            itemsGrid.innerHTML = '';
+
+            itemsEpi.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.ca}</td>
+                    <td>${item.nome}</td> <!-- Supondo que 'nome' seja a coluna desejada -->
+                    <td>${item.validity}</td>
+                    <td>
+                        <a href="editItemEpi.html?ca=${item.ca}" class="btn btn-warning btn-sm">Editar</a>
+                        <button class="btn btn-danger btn-sm" onclick="confirmarExclusao('${item.ca}', '${item.nome}')">Excluir</button>
+                    </td>
+                `;
+                itemsGrid.appendChild(row);
+            });
+        }
+
+        function confirmarExclusao(ca, nome) {
+            itemEpiIdParaExcluir = ca;
+            caItemParaExcluir = ca;
+
+            document.getElementById('modalBodyTexto').innerHTML = `Tem certeza que deseja excluir o item com CA <b>${ca}</b> e Nome <b>${nome}</b>?`;
+
+            new bootstrap.Modal(document.getElementById('staticBackdrop')).show();
+        }
+
+        async function excluirItemEpi() {
+            if (itemEpiIdParaExcluir !== null) {
+                const response = await fetch(`http://localhost:3000/api/items_epi/${caItemParaExcluir}`, { method: 'DELETE' });
+
+                if (response.ok) {
+                    alert('Item excluído com sucesso!');
+                    carregarItemsEpi();
+                } else {
+                    alert('Erro ao excluir item. Tente novamente.');
+                }
+
+                itemEpiIdParaExcluir = null;
+                new bootstrap.Modal(document.getElementById('staticBackdrop')).hide();
+            }
+        }
+
+        async function salvarItemEpi(event) {
+            event.preventDefault();
+
+            const ca = document.getElementById('ca').value;
+            const validity = document.getElementById('validity').value;
+            const id_items = document.getElementById('id_items').value;
+
+            const itemEpi = {
+                ca: ca,
+                validity: validity,
+                id_items: id_items
+            };
+
+            let response;
+            
+            if (ca) {
+                response = await fetch(`http://localhost:3000/api/items_epi/${ca}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(itemEpi),
+                });
+                if (response.ok) {
+                    alert('Item atualizado com sucesso!');
+                }
+            } else {
+                response = await fetch('http://localhost:3000/api/items_epi', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(itemEpi),
+                });
+                if (response.ok) {
+                    alert('Item criado com sucesso!');
+                }
+            }
+
+            carregarItemsEpi();
+        }
+
+        function imprimirItems() {
+            const content = document.querySelector(".container").innerHTML;
+            const win = window.open();
+            win.document.write(content);
+            win.print();
+            win.close();
+        }
+
+        carregarItemsEpi();
+    </script>
 
 </body>
 </html>

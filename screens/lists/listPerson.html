@@ -69,7 +69,7 @@
                 <tr>
                     <th class="larguraAll">ID</th>
                     <th class="larguraAll">Nome</th>
-                    <th class="larguraAll">Documento</th>
+                    <th class="larguraAll">Ação</th>
                 </tr>
             </thead>
 
@@ -80,7 +80,7 @@
 
       <div class="grupo-botoes">   
           
-          <a class="btn btn-success" href="cads/cadPerson.html" role="button">
+          <a class="btn btn-success" href="cadPerson.html" role="button">
             <i class="bi bi-plus-circle-fill"></i>
               Cadastrar
           </a>
@@ -98,24 +98,57 @@
       
     </div>
   
-  <!-- Modal -->
-  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          ...
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Understood</button>
-        </div>
-      </div>
-    </div>
-  </div>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-beta1/js/bootstrap.bundle.min.js"></script>
 
+    <script>
+        let pessoaIdParaExcluir = null;
+        let nomePessoaParaExcluir = '';
+
+        async function carregarPessoas() {
+            const response = await fetch('https://cefb9c9b-1c49-4c67-9064-bd6b7509fdf7.mock.pstmn.io/pessoas');
+            const pessoas = await response.json();
+            const pessoasGrid = document.getElementById('pessoasGrid');
+            pessoasGrid.innerHTML = '';
+
+            pessoas.forEach(pessoa => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${pessoa.id}</td>
+                    <td>${pessoa.nome}</td>
+                    <td>
+                        <a href="cadPerson.html?id=${tipo.id}" class="btn btn-warning btn-sm">Editar</a>
+                        <button class="btn btn-danger btn-sm" onclick="confirmarExclusao(${tipo.id}, '${tipo.nome}')">Excluir</button>
+                    </td>
+                `;
+                pessoasGrid.appendChild(row);
+            });
+        }
+
+        function confirmarExclusao(id, nome) {
+            pessoaIdParaExcluir = id;
+            nomePessoaParaExcluir = nome;
+
+            document.getElementById('modalBodyTexto').innerHTML = `Tem certeza que deseja excluir a pessoa <b>  ${nome}</b>?`;
+
+            new bootstrap.Modal('#staticBackdrop').show();
+        }
+
+        async function excluirItemTipo() {
+            if (itemTipoIdParaExcluir !== null) {
+                const response = await fetch(`http://localhost:3000/api/pessoas/${pessoaIdParaExcluir}`, { method: 'DELETE' });
+                if (response.ok) {
+                    alert('Pessoa excluída com sucesso!');
+                    carregarPessoas();
+                }
+                pessoaIdParaExcluir = null; 
+                new bootstrap.Modal(document.getElementById('staticBackdrop')).hide(); 
+            }
+        }
+
+        carregarPessoas();
+    
+    </script>
+  
 </body>
 </html>
