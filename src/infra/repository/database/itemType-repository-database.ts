@@ -35,7 +35,7 @@ export default class ItemTypeRepositoryDatabase implements ItemTypeRepository {
         }
 
         return new ItemType(itemData.id, itemData.name);
-        
+    }
 
     async create(item: any): Promise<void> {
         const { id, name } = item;
