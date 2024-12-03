@@ -9,14 +9,15 @@ export default class ItemRepositoryDatabase implements ItemRepository {
     async getAll(): Promise<Item[]> {
         const output = []
         const itemsData = await this.connection.execute(`
-        select items.id as id, items.name as nome_item, id_items_type as id_tipo_items from items
-        left join items_type on items.id_items_type = items_type.id
+        SELECT items.id as id, items.name as nome_item, id_items_type as id_item_type, name_item_type as itemType_name FROM items
+        LEFT JOIN items_type on items.id_items_type = items_type.id
         `);
 
         for (const itemData of itemsData) {
             const itemType = new ItemType(
-                itemData.id_tipo_items
-            )
+                itemData.id_tipo_items,
+                itemData.nome_tipo_item
+            );
 
             const item = new Item(
                 itemData.nome_item,
@@ -28,8 +29,11 @@ export default class ItemRepositoryDatabase implements ItemRepository {
         }
         return output;
     }
+
     getById(id: string): Promise<Item> {
-        throw new Error("Method not implemented.");
+        const [ itemData ] = await this.connection.execute(`
+            SELECT i.id, i.name, it.id as items_type.id, it.name as items_type.name
+            `)
     }
     create(item: Item): Promise<void> {
         throw new Error("Method not implemented.");
