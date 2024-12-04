@@ -1,103 +1,138 @@
+import { Item } from "../../../domain/entity/item";
 import { Loan } from "../../../domain/entity/loan";
+import { Person } from "../../../domain/entity/person";
+import { User } from "../../../domain/entity/user";
 import { LoanRepository } from "../../../domain/repository/loan-repository";
 import { Connection } from "../../database/connection";
 
 export default class LoanRepositoryDatabase implements LoanRepository{
     constructor(private connection: Connection) {}
+
+    async getAll(): Promise<Loan[]>{
+        const output = []
+        const loansData = await this.connection.execute(`
+        SELECT l.id, l.date_loan, l.date_return,
+               p.nome AS person_name, p.document, p.id AS id_person,
+               u.user_name, u.id AS id_user,
+               i.name, i.id AS id_item,
+        FROM loans e
+        LEFT JOIN people p ON l.id_person = p.id
+        LEFT JOIN users u ON e.id_user = u.id
+        LEFT JOIN items i ON e.id_item = i.id
+        `);
     
-        async getAll(): Promise<Loan[]> {
-            const output: Loan[] = [];
-            try {
-                const loansData = await this.connection.execute(
-                    'SELECT id, id_user, id_item, date_loan, date_return FROM loans'
-                );
+        for (const loanData of loansData) {
     
-                if (loansData && loansData.length > 0) {
-                    for (const loanData of loansData) {
-                        const loan = new Loan(
-                            loanData.id,
-                            loanData.id_user,
-                            loanData.id_item,
-                            loanData.date_loan,
-                            loanData.date_return
-                        );
-                        output.push(loan);
-                    }
-                }
+            const item = new Item(
+                loanData.name,   
+                loanData.id       
+            );
     
-                return output;
-            } catch (error) {
-                throw new Error(`Erro ao buscar empréstimo: ${error}`);
-            }
+            const person = new Person(
+                loanData.document,  
+                loanData.name,  
+                loanData.id_person    
+            );
+
+            const user = new User(
+                person,                       
+                loanData.user_name,   
+                loanData.id_user   
+            );
+    
+            const loan = new Loan(
+                person,
+                user,
+                item,
+                loanData.date_loan,
+                loanData.date_return,
+                loanData.id
+            );
+
+            output.push(loan)
         }
-    
-        async getById(id: any): Promise<Loan> {
-            try {
-                const loanData: Loan = await this.connection.execute(
-                    'SELECT id, id_user, id_item, date_loan, date_return FROM loans WHERE id = :id',
-                    { id }
-                );
-    
-                if (!loansData) {
-                    throw new Error(`Empréstimo com o id ${id} não encontrado`);
-                }
-    
-                return new Loan(
-                    loanData.id,
-                    loanData.id_user,
-                    loanData.id_item,
-                    loanData.date_loan,
-                    loanData.date_return
-                );
-            } catch (error) {
-                throw new Error(`Erro ao buscar usuário com o id ${id}: ${error}`);
-            }
-        }
-    
-        async create(loan: any): Promise<void> {
-            try {
-                const { id, id_user, id_item, date_loan, date_return } = loan;
-                const result = await this.connection.execute(
-                    'INSERT INTO loans (id, id_user, id_item, date_loan, date_return) VALUES (:id, :id_user, :id_item, :date_loan, :date_return)',
-                    { id, id_user, id_item, date_loan, date_return }
-                );
-    
-                if (result.affectedRows === 0) {
-                    throw new Error('Falha ao inserir empréstimo');
-                }
-            } catch (error) {
-                throw new Error(`Erro ao criar Empréstimo: ${error}`);
-            }
-        }
-    
-        async update(loan: any): Promise<void> {
-            try {
-                const { id, id_user, id_item, date_loan, date_return } = loan;
-                const result = await this.connection.execute(
-                    'UPDATE loans SET id_user = :id_user, id_item = :id_item, date_loan = :date_loan, date_return = :date_return WHERE id = :id',
-                    { id, id_user, id_item, date_loan, date_return }
-                );
-    
-                if (result.affectedRows === 0) {
-                    throw new Error(`Usuário com o id ${id} não encontrado`);
-                }
-            } catch (error) {
-                throw new Error(`Erro ao atualizar usuário com io id ${loan.id}: ${error}`);
-            }
-        }
-    
-        async delete(id: any): Promise<void> {
-            try {
-                const result = await this.connection.execute(
-                    'DELETE FROM loans WHERE id = :id',
-                    { id }
-                );
-    
-                if (result.affectedRows === 0) {
-                    throw new Error(`Empréstimo com o id ${id} não encontrado`);
-                }
-            } catch (error) {
-                throw new Error(`Erro ao deletar o empréstimo ${id}: ${error}`);
-            }
-        }
+
+        return output;
     }
+
+    async getById(id: string): Promise<Loan>{
+        const [ loanData ] = await this.connection.execute(`
+        SELECT l.id, l.date_loan, l.date_return,
+               p.nome AS person_name, p.document, p.id AS id_person,
+               u.user_name, u.id AS id_user,
+               i.name, i.id AS id_item,
+        FROM loans l
+        LEFT JOIN people p ON l.id_person = p.id
+        LEFT JOIN users u ON e.id_user = u.id
+        LEFT JOIN items i ON e.id_item = i.id
+        WHERE l.id = $1`,
+            [id]
+        );
+
+        if (!loanData) {
+            throw new Error('Emprestimo não encontrado');
+        }
+
+        const item = new Item(
+            loanData.name,   
+            loanData.id 
+        );
+
+        const person = new Person(
+            loanData.document,  
+            loanData.name,  
+            loanData.id_person
+        );
+
+        const user = new User(
+            person,                       
+            loanData.user_name,   
+            loanData.id_user 
+        );
+
+        const loan = new Loan(
+            person,
+            user,
+            item,
+            loanData.date_loan,
+            loanData.date_return,
+            loanData.id
+        );
+
+        return loan;
+    }
+
+    async create(loan: Loan): Promise<void>{
+        await this.connection.execute(`
+        INSERT INTO loans (id, id_user, id_item, date_return, date_return)
+        VALUES ($1, $2, $3, $4, $5, $6)`,
+            [loan.getId(),
+            loan.getPerson().getId(),
+            loan.getUser().getId(),
+            loan.getItem().getId(),
+            loan.getLoanDate(),
+            loan.getReturnDate()]);
+    }
+
+    async update(loan: Loan): Promise<void>{
+        await this.connection.execute(`
+        UPDATE emprestimos
+        SET id_person = $1,
+            id_user = $2,
+            id_item = $3,
+            date_loan = $4,
+            date_return = $5
+        WHERE id = $6`,
+            [loan.getId(),
+            loan.getPerson().getId(),
+            loan.getUser().getId(),
+            loan.getItem().getId(),
+            loan.getLoanDate(),
+            loan.getReturnDate()]);
+    }
+
+    async delete(id: string): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
+    
+}

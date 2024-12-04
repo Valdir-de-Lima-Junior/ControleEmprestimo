@@ -3,137 +3,111 @@ import { User } from "../../../domain/entity/user";
 import { UserRepository } from "../../../domain/repository/user-repository";
 import { Connection } from "../../database/connection";
 
-interface UserData {
-        id: string;
-        id_person: string;
-        user_name: string;
-        pass: string;
-    }
-    
     export default class UserRepositoryDatabase implements UserRepository {
         constructor(private connection: Connection) {}
-    
-        // Método para buscar todos os usuários
+        
         async getAll(): Promise<User[]> {
-            const output: User[] = [];
-            try {
-                const usersData: UserData[] = await this.connection.execute(
-                    'SELECT id, id_person, user_name, pass FROM users'
+            const output = [];
+            const usersData = await this.connection.execute(`
+                SELECT people.name, people.document, users.id_person AS id, users.user_name, users.id
+                FROM users
+                LEFT JOIN people ON users.id_person = people.id
+            `);
+        
+            for (const userData of usersData) {
+                const person = new Person(
+                    userData.document,
+                    userData.name,
+                    userData.id_person
                 );
-    
-                if (usersData && usersData.length > 0) {
-                    for (const userData of usersData) {
-                        const user = new User(
-                            userData.id,
-                            userData.id_person,
-                            userData.user_name,
-                            userData.pass
-                        );
-                        output.push(user);
-                    }
-                }
-    
-                return output;
-            } catch (error: unknown) {
-                if (error instanceof Error) {
-                    throw new Error(`Erro au bescar usuários: ${error.message}`);
-                } else {
-                    throw new Error('Ocorreu um erro desconhecido ao buscar o usuário');
-                }
+                const user = new User(
+                    person,
+                    userData.nome,
+                    userData.id
+                );
+        
+                output.push(user);
             }
+        
+            return output;
+        }    
+        
+        async getById(id: string): Promise<User> {
+            const [ userData ] = await this.connection.execute(`
+                SELECT people.name, people.document, users.id_person AS id, users.user_name, users.id
+                FROM users
+                LEFT JOIN people ON users.id_person = people.id
+                WHERE users.id = $1`,
+                [id]
+            );
+        
+            if (!userData) {
+                throw new Error('Usuario não encontrado');
+            }
+        
+            const person = new Person(
+                userData.document,
+                userData.name,
+                userData.id_person
+            );
+            const user = new User(
+                person,
+                userData.user_name,
+                userData.id       
+            );
+        
+            return user;
         }
-    
-        async getById(id: any): Promise<User> {
-            try {
-                const usersData: any = await this.connection.execute(
-                    'SELECT id, id_person, user_name, pass FROM users WHERE id = :id',
-                    { id }
-                );
         
-                if (usersData.length === 0) {
-                    throw new Error(`User com o id ${id} não encontrado`);
-                }
+        async getByUserName(user_name: string): Promise<User> {
+            const [ userData ] = await this.connection.execute(`
+                SELECT people.name, people.document, users.id_person AS id, users.user_name, users.id
+                FROM users
+                LEFT JOIN people ON users.id_person = people.id
+                WHERE users.user_name = $1`,
+                [user_name]
+            );
         
-                const userData = usersData[0]; 
+            if (!userData) {
+                throw new Error('Usuario não encontrado');
+            }
+        
+            const person = new Person(
+                userData.document,
+                userData.name,
+                userData.id_person
+            );
+            const user = new User(
+                person,
+                userData.user_name,
+                userData.id       
+            );
+        
+            return user;
 
-                return new User(
-                    userData.id,
-                    userData.id_person,
-                    userData.user_name,
-                    userData.pass
-                );
-            } catch (error: unknown) {
-                if (error instanceof Error) {
-                    throw new Error(`Error ao buscar o usuário com o id ${id}: ${error.message}`);
-                } else {
-                    throw new Error('Ocorreu um erro desconhecido ao buscar o usuário');
-                }
-            }
         }
         
+        async create(user: User): Promise<void> {
+            await this.connection.execute(`
+                INSERT INTO usuarios (id, id_person, user_name)
+                VALUES ($1, $2, $3)`,
+                [user.getId(), user.getPerson().getId(), user.getName()]
+            );
+        }
         
+        async update(user: User): Promise<void> {
+            await this.connection.execute(`
+                UPDATE users
+                SET id_person = $1,
+                    user_name = $2
+                WHERE id = $3`,
+                [user.getPerson().getId(), user.getName(),user.getId()]
+            );
     
-        // Método para criar um novo usuário
-        async create(): Promise<void> {
-            try {
-                const { id, id_person, user_name, pass } = user;
-                const result = await this.connection.execute(
-                    'INSERT INTO users (id, id_person, user_name, pass) VALUES (:id, :id_person, :user_name, :pass)',
-                    { id, id_person, user_name, pass }
-                );
-    
-                if (result.affectedRows === 0) {
-                    throw new Error('Falha ao inserir Usuário');
-                }
-            } catch (error: unknown) {
-                if (error instanceof Error) {
-                    throw new Error(`Erro ao criar Usuário: ${error.message}`);
-                } else {
-                    throw new Error('Ocorreu um erro desconhecido ao criar o usuário');
-                }
-            }
         }
-    
-        // Método para atualizar um usuário existente
-        async update(): Promise<void> {
-            try {
-                const { id, id_person, user_name, pass } = user;
-                const result = await this.connection.execute(
-                    'UPDATE users SET id_person = :id_person, user_name = :user_name, pass = :pass WHERE id = :id',
-                    { id, id_person, user_name, pass }
-                );
-    
-                if (result.affectedRows === 0) {
-                    throw new Error(`Usuário com o id ${id} não encontrado`);
-                }
-            } catch (error: unknown) {
-                if (error instanceof Error) {
-                    throw new Error(`Erro ao atualizar o usuário com o id ${user.id}: ${error.message}`);
-                } else {
-                    throw new Error('Ocorreu um erro desconhecido ao atualizar o usuário');
-                }
-            }
+        
+        async delete(id: string): Promise<void> {
+            throw new Error("Method not implemented.");
         }
-    
-        // Método para excluir um usuário pelo ID
-        async delete(id: any): Promise<void> {
-            try {
-                const result = await this.connection.execute(
-                    'DELETE FROM users WHERE id = :id',
-                    { id }
-                );
-    
-                if (result.userData === 0) {
-                    throw new Error(`Usuário com o id ${id} não encontrado`);
-                }
-            } catch (error: unknown) {
-                if (error instanceof Error) {
-                    throw new Error(`Erro ao deletar o usuário com o id ${id}: ${error.message}`);
-                } else {
-                    throw new Error('Ocorreu um erro desconhecido ao excluir o usuário');
-                }
-            }
-        }
-    
-    
-}
+        
+    }
