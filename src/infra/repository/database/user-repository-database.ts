@@ -16,13 +16,15 @@ import { Connection } from "../../database/connection";
         
             for (const userData of usersData) {
                 const person = new Person(
-                    userData.document,
+                    userData.id_person,
                     userData.name,
-                    userData.id_person
+                    userData.document
+                    
                 );
+                
                 const user = new User(
+                    userData.name,
                     person,
-                    userData.nome,
                     userData.id
                 );
         
@@ -51,8 +53,8 @@ import { Connection } from "../../database/connection";
                 userData.id_person
             );
             const user = new User(
-                person,
                 userData.user_name,
+                person,
                 userData.id       
             );
         
@@ -78,8 +80,8 @@ import { Connection } from "../../database/connection";
                 userData.id_person
             );
             const user = new User(
-                person,
                 userData.user_name,
+                person,
                 userData.id       
             );
         

@@ -23,7 +23,7 @@ export default class PersonRepositoryDatabase implements PersonRepository {
         return output;
     }
 
-    async getById(id: any): Promise<Person> {
+    async getById(id: string): Promise<Person> {
         const [personData] = await this.connection.execute(
             `SELECT people.id, people.name, people.document FROM people WHERE people.id = $1`,
             [ id ]

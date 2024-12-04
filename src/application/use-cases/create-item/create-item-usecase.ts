@@ -3,7 +3,6 @@ import { ItemRepository } from "../../../domain/repository/item-repository";
 import { ItemTypeRepository } from "../../../domain/repository/item-type-repository";
 import { RepositoryFactory } from "../../../domain/repository/repository-factory";
 import { CreateItemInput } from "./create-item-input";
-import { CreateItemOutput } from "./create-item-output";
 
 export class CreateItemUseCase{
     private itemRepository: ItemRepository;

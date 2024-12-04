@@ -35,15 +35,15 @@ export default class LoanRepositoryDatabase implements LoanRepository{
             );
 
             const user = new User(
-                person,                       
-                loanData.user_name,   
+                loanData.user_name,
+                person,
                 loanData.id_user   
             );
     
             const loan = new Loan(
+                item,
                 person,
                 user,
-                item,
                 loanData.date_loan,
                 loanData.date_return,
                 loanData.id
@@ -85,15 +85,15 @@ export default class LoanRepositoryDatabase implements LoanRepository{
         );
 
         const user = new User(
+            loanData.user_name,
             person,                       
-            loanData.user_name,   
             loanData.id_user 
         );
 
         const loan = new Loan(
+            item,
             person,
             user,
-            item,
             loanData.date_loan,
             loanData.date_return,
             loanData.id

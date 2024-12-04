@@ -23,7 +23,7 @@ export default class ItemRepositoryDatabase implements ItemRepository {
         return output;
     }
 
-    async getById(id: any): Promise<Item> {
+    async getById(id: string): Promise<Item> {
         const [itemData]: any[] = await this.connection.execute(
             `SELECT id_items_type, id, name FROM items WHERE id = :id`,
             [ id ]
