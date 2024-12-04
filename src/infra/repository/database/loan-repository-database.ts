@@ -15,7 +15,7 @@ export default class LoanRepositoryDatabase implements LoanRepository{
                p.nome AS person_name, p.document, p.id AS id_person,
                u.user_name, u.id AS id_user,
                i.name, i.id AS id_item,
-        FROM loans e
+        FROM loans l
         LEFT JOIN people p ON l.id_person = p.id
         LEFT JOIN users u ON e.id_user = u.id
         LEFT JOIN items i ON e.id_item = i.id
@@ -116,7 +116,7 @@ export default class LoanRepositoryDatabase implements LoanRepository{
 
     async update(loan: Loan): Promise<void>{
         await this.connection.execute(`
-        UPDATE emprestimos
+        UPDATE loans
         SET id_person = $1,
             id_user = $2,
             id_item = $3,

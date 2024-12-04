@@ -89,7 +89,7 @@ import { Connection } from "../../database/connection";
         
         async create(user: User): Promise<void> {
             await this.connection.execute(`
-                INSERT INTO usuarios (id, id_person, user_name)
+                INSERT INTO users (id, id_person, user_name)
                 VALUES ($1, $2, $3)`,
                 [user.getId(), user.getPerson().getId(), user.getName()]
             );
