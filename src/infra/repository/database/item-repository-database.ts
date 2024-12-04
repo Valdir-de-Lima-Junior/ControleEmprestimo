@@ -8,7 +8,7 @@ export default class ItemRepositoryDatabase implements ItemRepository {
     async getAll(): Promise<Item[]> {
         const output: Item[] = [];
         const itemsData = await this.connection.execute(
-            'SELECT id_items_type, id, name FROM items'
+            `SELECT id_items_type, id, name FROM items`
         );
 
         for (const itemData of itemsData) {
@@ -25,8 +25,8 @@ export default class ItemRepositoryDatabase implements ItemRepository {
 
     async getById(id: any): Promise<Item> {
         const [itemData]: any[] = await this.connection.execute(
-            'SELECT id_items_type, id, name FROM items WHERE id = :id',
-            { id }
+            `SELECT id_items_type, id, name FROM items WHERE id = :id`,
+            [ id ]
         );
 
         if (!itemData) {
@@ -36,35 +36,24 @@ export default class ItemRepositoryDatabase implements ItemRepository {
         return new Item(itemData.id_items_type, itemData.id, itemData.name);
     }
 
-    async create(item: any): Promise<void> {
-        const { id_items_type, id, name } = item;
+    async create(item: Item): Promise<void> {
         await this.connection.execute(
-            'INSERT INTO items (id_items_type, id, name) VALUES (:id_items_type, :id, :name)',
-            { id_items_type, id, name }
+            `INSERT INTO items (id_items_type, id, name) VALUES ($1, $2, $3)`,
+            [item.getType().getId(), item.id, item.name]
         );
     }
 
-    async update(item: any): Promise<void> {
-        const { id_items_type, id, name } = item;
-        const result = await this.connection.execute(
-            'UPDATE items SET id_items_type = :id_items_type, name = :name WHERE id = :id',
-            { id_items_type, id, name }
+    async update(item: Item): Promise<void> {
+        await this.connection.execute(
+            `UPDATE items SET name = $1, 
+                    id_items_type = $2 
+                    WHERE id = $3`,
+            [ item.name, item.getType().getId(), item.id]
         );
-
-        if (result.affectedRows === 0) {
-            throw new Error(`Item com o id ${id} não encontrado`);
-        }
     }
 
-    async delete(id: any): Promise<void> {
-        const result = await this.connection.execute(
-            'DELETE FROM items WHERE id = :id',
-            { id }
-        );
-
-        if (result.affectedRows === 0) {
-            throw new Error(`Item com o id ${id} não encontrado`);
-        }
+    async delete(id: string): Promise<void> {
+        throw new Error("Method not implemented.");
     }
 }
   

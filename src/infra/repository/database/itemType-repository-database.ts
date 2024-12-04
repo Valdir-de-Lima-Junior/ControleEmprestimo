@@ -1,4 +1,3 @@
-import { Item } from "../../../domain/entity/item";
 import { ItemType } from "../../../domain/entity/item-type";
 import { ItemTypeRepository } from "../../../domain/repository/item-type-repository";
 import { Connection } from "../../database/connection";
@@ -8,15 +7,15 @@ export default class ItemTypeRepositoryDatabase implements ItemTypeRepository {
     constructor(private connection: Connection) {}
 
     async getAll(): Promise<ItemType[]> {
-        const output: ItemType[] = [];
-        const itemsData = await this.connection.execute(
-            'SELECT id, name FROM items_type'
+        const output = [];
+        const itemsTypeData = await this.connection.execute(
+            `SELECT id, name FROM items_type`
         );
 
-        for (const itemData of itemsData) {
+        for (const itemTypeData of itemsTypeData) {
             const item = new ItemType(
-                itemData.id,
-                itemData.name
+                itemTypeData.id,
+                itemTypeData.name
             );
             output.push(item);
         }
@@ -24,69 +23,47 @@ export default class ItemTypeRepositoryDatabase implements ItemTypeRepository {
         return output;
     }
 
-    async getById(id: any): Promise<ItemType> {
-        const [itemData]: any[] = await this.connection.execute(
-            'SELECT id, name FROM items_type WHERE id = :id',
-            { id }
+    async getById(id: string): Promise<ItemType> {
+        const [itemData] = await this.connection.execute(
+            `SELECT id, name FROM items_type WHERE id = $1`,
+            [ id ]
         );
 
         if (!itemData) {
-            throw new Error(`Item com o id ${id} não encontrado`);
+            throw new Error(`Item Type não encontrado`);
         }
 
         return new ItemType(itemData.id, itemData.name);
     }
 
-    async create(item: any): Promise<void> {
-        const { id, name } = item;
+    async create(itemType: ItemType): Promise<void> {
         await this.connection.execute(
-            'INSERT INTO items_type (id, name) VALUES (:id, :name)',
-            { id, name }
+            `INSERT INTO items_type (id, name) VALUES ($1, $2)`,
+            [itemType.getId(), itemType.getName()]
         );
     }
 
-    async update(item: any): Promise<void> {
-        const { id, name } = item;
-        const result = await this.connection.execute(
-            'UPDATE items_type SET name = :name WHERE id = :id',
-            { id, name }
+    async update(itemType: ItemType): Promise<void> {
+        await this.connection.execute(
+            `UPDATE items_type SET name = $1 WHERE id = $2`,
+            [itemType.getName(), itemType.getId()]
         );
-
-        if (result.affectedRows === 0) {
-            throw new Error(`Item com o id ${id} não encontrado`);
-        }
     }
 
-    async delete(id: any): Promise<void> {
-        const result = await this.connection.execute(
-            'DELETE FROM items_type WHERE id = :id',
-            { id }
+    async delete(id: string): Promise<void> {
+        const [ itemTypeData ] = await this.connection.execute(
+            'DELETE FROM items_type WHERE id = $1',
+            [ id ]
         );
 
-        if (result.affectedRows === 0) {
-            throw new Error(`Item com o id ${id} não encontrado`);
-        }
     }
  
-    async  getAll(): Promise<ItemType[]> {
-        const output = [];
-        const ItemType = await this.connection.getRepository(ItemType).execute(`
-        SELECT ItemType.nome AS nome, ItemType.id AS id 
-        FROM ItemType
-        LEFT JOIN Item ON Item.idItemType = ItemType.id
-        `);
-        
-        for(const item of ItemType){
-        const itemOutput = new ItemType(
-            item.id,
-            item.nome
-            );
-    
-        const itemOutput2 = new Item(
-            item.id,
-            item.nome,
-            item.idItemType
-            );
-        }
-      }
-    }
+
+    // async delete(id: string): Promise<void> {
+    //     const [ itemTypeData ] = await this.connection.execute(`
+    //         DELETE FROM tipos_item
+    //         WHERE id = $1`,
+    //         [id]);
+    // }
+
+}

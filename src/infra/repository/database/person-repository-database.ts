@@ -6,9 +6,9 @@ export default class PersonRepositoryDatabase implements PersonRepository {
     constructor(private connection: Connection) {}
 
     async getAll(): Promise<Person[]> {
-        const output: Person[] = [];
+        const output = [];
         const peopleData = await this.connection.execute(
-            'SELECT id, name, document FROM people'
+            `SELECT people.id, people.name, people.document FROM people`
         );
 
         for (const personData of peopleData) {
@@ -25,49 +25,41 @@ export default class PersonRepositoryDatabase implements PersonRepository {
 
     async getById(id: any): Promise<Person> {
         const [personData] = await this.connection.execute(
-            'SELECT id, name, document FROM people WHERE id = :id',
-            { id }
+            `SELECT people.id, people.name, people.document FROM people WHERE people.id = $1`,
+            [ id ]
         );
 
         if (!personData) {
-            throw new Error(`Pessoa com o id ${id} não encontrada`);
+            throw new Error(`Pessoa não encontrada`);
         }
 
-        return new Person(
+        const person = new Person(
             personData.id, 
             personData.name, 
             personData.document
         );
+
+        return person;
     }
 
-    async create(person: any): Promise<void> {
-        const { id, name, document } = person;
+    async create(person: Person): Promise<void> {
         await this.connection.execute(
-            'INSERT INTO people (id, name, document) VALUES (:id, :name, :document)',
-            { id, name, document }
+            `INSERT INTO people (id, name, document) VALUES $1, $2, $3)`,
+            [person.getId(), person.getName(), person.getDocument()]
         );
     }
 
-    async update(person: any): Promise<void> {
-        const { id, name, document } = person;
-        const result = await this.connection.execute(
-            'UPDATE people SET name = :name, document = :document WHERE id = :id',
-            { id, name, document }
+    async update(person: Person): Promise<void> {
+        await this.connection.execute(
+            `UPDATE people SET name = $2, document = $3 WHERE id = $1`,
+            [person.getId(), person.getName(), person.getDocument()]
         );
-
-        if (result.affectedRows === 0) {
-            throw new Error(`Pessoa com o id ${id} não encontrada`);
-        }
     }
 
-    async delete(id: any): Promise<void> {
+    async delete(id: string): Promise<void> {
         const result = await this.connection.execute(
-            'DELETE FROM people WHERE id = :id',
-            { id }
+            `DELETE FROM people WHERE id = $1`,
+            [ id ]
         );
-
-        if (result.affectedRows === 0) {
-            throw new Error(`Pessoa com o id ${id} não encontrada`);
-        }
     }
 }
